@@ -9,6 +9,8 @@ from tqdm import tqdm
 from axis_engineering import engineer_axes_llm
 from axis_persona import build_axis_personas
 from config import (
+    LABELS_PATH,
+    PERSONAS_PATH,
     AXIS_PERSONA_N,
     FACTOR_METHODS,
     MAX_ENGINEERED_AXES,
@@ -17,7 +19,6 @@ from config import (
     MIN_HISTORY_LEN,
     N_EVAL_USERS,
     N_FACTORS,
-    N_NEGATIVES,
     RANDOM_SEED,
     TOP_K,
 )
@@ -25,7 +26,7 @@ from data import (
     # build_item_genre_matrix,  # genre 방법 전용 -- FACTOR_METHODS에서 제외되어 미사용
     build_rating_matrix,
     filter_users_by_history,
-    leave_one_out_split,
+    split_by_labels,
     load_movielens,
 )
 from evaluate import hit_at_k, mrr, ndcg_at_k
@@ -50,7 +51,14 @@ def main(
         f"user pool (history in [{min_history_len}, {max_history_len or 'inf'}], "
         f"capped at {MAX_POOL_USERS}): {ratings.userId.nunique()}"
     )
-    train, test = leave_one_out_split(ratings, RANDOM_SEED)
+    # 후보 20개와 정답은 공용 라벨 파일에서 그대로 가져온다 -- 실행할 때마다 negative를 뽑으면
+    # 같은 유저라도 후보가 달라져 다른 실험과 숫자를 나란히 놓을 수 없다.
+    labels = pd.read_excel(LABELS_PATH)
+    answer = {int(r.userId): int(r.answer_movieId) for r in labels.itertuples()}
+    candidate_ids = {int(r.userId): json.loads(r.candidate_movieIds) for r in labels.itertuples()}
+    print(f"라벨 파일: {LABELS_PATH.name} -- 유저 {len(answer)}명, 유저당 후보 "
+          f"{len(next(iter(candidate_ids.values())))}개")
+    train = split_by_labels(ratings, answer)
 
     user_ids = sorted(ratings.userId.unique())
     item_ids = sorted(ratings.movieId.unique())
@@ -77,6 +85,15 @@ def main(
         "min_history_len": min_history_len,
         "max_history_len": max_history_len, "max_pool_users": MAX_POOL_USERS,
     }
+    # build_personas.py 가 만들어 커밋해둔 페르소나가 있으면 그걸 쓴다 -- 라벨 파일과 같은 취지로,
+    # 매 실행 새로 생성하면 프로필 조건이 흔들려 결과를 비교할 수 없다.
+    saved_personas = {}
+    if os.path.exists(PERSONAS_PATH):
+        with open(PERSONAS_PATH, encoding="utf-8") as f:
+            saved = json.load(f)
+        saved_personas = {m: saved[m] for m in FACTOR_METHODS if m in saved}
+        print(f"고정 페르소나 사용: {PERSONAS_PATH} ({', '.join(saved_personas)})")
+
     cache = {}
     if os.path.exists(cache_file):
         with open(cache_file, encoding="utf-8") as f:
@@ -113,6 +130,8 @@ def main(
         # 축마다 양 끝 AXIS_PERSONA_N편씩을 보여주고 축 에이전트 페르소나를 받아둔다 (유저 수와 무관, 축당 1회)
         if cached:
             axis_personas = cached["personas"]
+        elif method in saved_personas:  # build_personas.py가 만들어 커밋해둔 고정 산출물
+            axis_personas = [e["raw"] for e in saved_personas[method]]
         else:
             axis_personas = build_axis_personas(
                 H, item_idx_inv, title_map, n_ratings, method, n_side=AXIS_PERSONA_N
@@ -130,8 +149,9 @@ def main(
             "axis_personas": axis_personas,
         }
 
+    label_users = np.array([u for u in sorted(answer) if u in user_idx])
     eval_users = rng.choice(
-        test.userId.values, size=min(n_eval_users, len(test)), replace=False
+        label_users, size=min(n_eval_users, len(label_users)), replace=False
     )
 
     # 유저마다 결과를 바로 append 한다 -- 500명이면 3시간 남짓 걸리는데 마지막에 한 번만
@@ -158,18 +178,12 @@ def main(
         if not history:
             continue
 
-        target_row = test[test.userId == uid].iloc[0]
-        target_id = int(target_row.movieId)
+        # 라벨 파일이 이미 셔플해 둔 순서를 그대로 쓴다(다시 섞으면 다른 실험과 후보 순서가
+        # 어긋나고, position bias는 파일 생성 시점에 이미 제거되어 있다).
+        target_id = answer[int(uid)]
+        candidates = [(m, title_map.get(m, str(m))) for m in candidate_ids[int(uid)]]
 
-        rated_ids = set(u_train.movieId) | {target_id}
-        neg_pool = [m for m in item_ids if m not in rated_ids]
-        negatives = rng.choice(neg_pool, size=min(N_NEGATIVES, len(neg_pool)), replace=False)
-
-        candidates = [(target_id, title_map.get(target_id, str(target_id)))]
-        candidates += [(m, title_map.get(m, str(m))) for m in negatives]
-        rng.shuffle(candidates)
-
-        row = {"userId": uid, "history_len": len(history) + 1}  # +1: leave-one-out으로 뺀 target 1개
+        row = {"userId": uid, "history_len": len(history) + 1}  # +1: 라벨로 빼둔 정답 1개
 
         # 인기도 베이스라인(MostPop): 유저를 전혀 보지 않고 평가 인원순으로만 정렬.
         # LLM 호출이 없어 비용 0이고, "넘어야 할 기준선" 역할을 한다 -- negative가 카탈로그에서

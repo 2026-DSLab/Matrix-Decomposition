@@ -1,7 +1,7 @@
-"""선배와 공유하는 전처리 데이터(interaction 300+ / 500 users)를 0820_CODE가 읽는
+"""선배와 공유하는 전처리 데이터(interaction 300+ / 500 users)를 axis_rerank가 읽는
 ml-latest 형식(ratings.csv, movies.csv)으로 변환한다.
 
-0820_CODE/data.py의 load_movielens()는 DATA_DIR 아래의 ratings.csv/movies.csv만 읽으므로,
+axis_rerank/data.py의 load_movielens()는 DATA_DIR 아래의 ratings.csv/movies.csv만 읽으므로,
 같은 컬럼명으로 맞춰주면 코드 수정 없이 MovieLens 10M 기반 공유 데이터를 쓸 수 있다.
 """
 import argparse
@@ -29,9 +29,9 @@ def main(ratings_xlsx: str, movies_dat: str, out_dir: str):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="공유 전처리 데이터 -> 0820_CODE 입력 형식 변환")
+    parser = argparse.ArgumentParser(description="공유 전처리 데이터 -> axis_rerank 입력 형식 변환")
     parser.add_argument("--ratings-xlsx", default="preprocessed/ratings_min300_500users.xlsx")
     parser.add_argument("--movies-dat", default="raw_data/ml-10M100K/movies.dat")
-    parser.add_argument("--out-dir", default="0820_CODE/data/ml10m-500users")
+    parser.add_argument("--out-dir", default="axis_rerank/data/ml10m-500users")
     args = parser.parse_args()
     main(args.ratings_xlsx, args.movies_dat, args.out_dir)

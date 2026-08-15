@@ -1,9 +1,10 @@
+import json
 import os
 
 import numpy as np
 import pandas as pd
 
-from config import DATA_DIR
+from config import DATA_DIR, LABELS_PATH
 
 
 def load_movielens():
@@ -36,10 +37,36 @@ def filter_users_by_history(
 
 
 def leave_one_out_split(ratings: pd.DataFrame, seed: int = 42):
-    """유저별 가장 최근 상호작용 1개를 test로 분리."""
+    """유저별 가장 최근 상호작용 1개를 test로 분리.
+
+    주의: timestamp가 동점인 유저가 500명 중 32명 있어서(한 유저가 5편을 같은 초에 평가한
+    경우도 있음) 어느 것이 '가장 최근'인지 정렬 방식에 따라 달라진다. 공용 라벨 파일이 있으면
+    split_by_labels를 쓸 것."""
     test_rows = ratings.sort_values("timestamp").groupby("userId").tail(1)
     train = ratings.drop(test_rows.index)
     return train.reset_index(drop=True), test_rows.reset_index(drop=True)
+
+
+def load_labels():
+    """공용 라벨 파일에서 유저별 정답과 후보 20개를 읽는다.
+
+    반환: ({userId: 정답 movieId}, {userId: [movieId 20개]}). 후보는 파일에 저장된 순서를
+    그대로 쓴다 -- 생성 시점에 이미 셔플되어 있어 다시 섞으면 다른 실험과 순서가 어긋난다."""
+    df = pd.read_excel(LABELS_PATH)
+    answer = {int(r.userId): int(r.answer_movieId) for r in df.itertuples()}
+    candidates = {int(r.userId): json.loads(r.candidate_movieIds) for r in df.itertuples()}
+    return answer, candidates
+
+
+def split_by_labels(ratings: pd.DataFrame, answer: dict):
+    """공용 라벨 파일이 지정한 정답 1개를 유저마다 빼고 나머지를 train으로 쓴다.
+
+    answer: {userId: 정답 movieId}. 정답이 train에 남아 있으면 프로필 생성에 그대로 노출되어
+    누출이 되므로 반드시 제거한다."""
+    ans = pd.DataFrame({"userId": list(answer), "movieId": list(answer.values()), "_ans": 1})
+    merged = ratings.merge(ans, on=["userId", "movieId"], how="left")
+    train = merged[merged["_ans"].isna()].drop(columns=["_ans"])
+    return train.reset_index(drop=True)
 
 
 def build_rating_matrix(train, n_users, n_items, user_idx, item_idx):

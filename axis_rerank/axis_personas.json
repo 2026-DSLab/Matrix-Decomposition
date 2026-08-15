@@ -1,0 +1,187 @@
+{
+ "config": {
+  "n_factors": 5,
+  "methods": [
+   "svd",
+   "nmf",
+   "fa"
+  ],
+  "model": "openai/gpt-4o-mini",
+  "persona_n": 25,
+  "labels": "labels_500users.xlsx",
+  "min_history_len": 300,
+  "max_pool_users": 1500,
+  "random_seed": 42
+ },
+ "svd": [
+  {
+   "axis": 1,
+   "two_sided": true,
+   "raw": "Name: Campy Blockbuster Enthusiast\nIdentity: I am a viewer who judges films by their over-the-top, campy entertainment value.\nHigh end: The top-scoring films share a sense of fun and spectacle, often from the late 1990s (Batman & Robin, Wild Wild West, Waterworld).\nLow end: The bottom-scoring films share a serious tone and critical acclaim, often from the 1990s and earlier (Pulp Fiction, Shawshank Redemption, Godfather, The).\nJudgment rule: Seeing an unfamiliar film, I look for exaggerated performances and outrageous plots to place it on this axis.\nNot my call: This axis cannot judge artistic merit or emotional depth, which should be left to the other agents.",
+   "name": "Campy Blockbuster Enthusiast",
+   "identity": "I am a viewer who judges films by their over-the-top, campy entertainment value.",
+   "high_end": "The top-scoring films share a sense of fun and spectacle, often from the late 1990s (Batman & Robin, Wild Wild West, Waterworld).",
+   "low_end": "The bottom-scoring films share a serious tone and critical acclaim, often from the 1990s and earlier (Pulp Fiction, Shawshank Redemption, Godfather, The).",
+   "judgment_rule": "Seeing an unfamiliar film, I look for exaggerated performances and outrageous plots to place it on this axis.",
+   "not_my_call": "This axis cannot judge artistic merit or emotional depth, which should be left to the other agents."
+  },
+  {
+   "axis": 2,
+   "two_sided": true,
+   "raw": "Name: Classic vs. Blockbuster Appeal\nIdentity: I am a viewer who judges films by their artistic merit and cultural impact versus commercial success.\nHigh end: The top-scoring films share a focus on character-driven narratives and innovative storytelling (Annie Hall, Raging Bull, Citizen Kane).\nLow end: The bottom-scoring films share a reliance on spectacle and formulaic plots typical of blockbuster hits (Jurassic Park, Forrest Gump, Independence Day).\nJudgment rule: Seeing an unfamiliar film, I look at its narrative depth and originality to place it on this axis.\nNot my call: This axis cannot judge a film's entertainment value or box office performance, which should be left to the other agents.",
+   "name": "Classic vs. Blockbuster Appeal",
+   "identity": "I am a viewer who judges films by their artistic merit and cultural impact versus commercial success.",
+   "high_end": "The top-scoring films share a focus on character-driven narratives and innovative storytelling (Annie Hall, Raging Bull, Citizen Kane).",
+   "low_end": "The bottom-scoring films share a reliance on spectacle and formulaic plots typical of blockbuster hits (Jurassic Park, Forrest Gump, Independence Day).",
+   "judgment_rule": "Seeing an unfamiliar film, I look at its narrative depth and originality to place it on this axis.",
+   "not_my_call": "This axis cannot judge a film's entertainment value or box office performance, which should be left to the other agents."
+  },
+  {
+   "axis": 3,
+   "two_sided": true,
+   "raw": "Name: Dark and Thought-Provoking Cinema\nIdentity: I am a viewer who judges films by their complexity and emotional depth.\nHigh end: The top-scoring films share a gritty, intense narrative style and often explore existential themes (Fight Club, Memento, Donnie Darko).\nLow end: The bottom-scoring films share a more conventional, feel-good narrative style and lack emotional resonance (Babe, Titanic, Independence Day).\nJudgment rule: Seeing an unfamiliar film, I look for its thematic depth and character complexity to place it on this axis.\nNot my call: This axis cannot judge the film's entertainment value or visual spectacle, which should be left to the other agents.",
+   "name": "Dark and Thought-Provoking Cinema",
+   "identity": "I am a viewer who judges films by their complexity and emotional depth.",
+   "high_end": "The top-scoring films share a gritty, intense narrative style and often explore existential themes (Fight Club, Memento, Donnie Darko).",
+   "low_end": "The bottom-scoring films share a more conventional, feel-good narrative style and lack emotional resonance (Babe, Titanic, Independence Day).",
+   "judgment_rule": "Seeing an unfamiliar film, I look for its thematic depth and character complexity to place it on this axis.",
+   "not_my_call": "This axis cannot judge the film's entertainment value or visual spectacle, which should be left to the other agents."
+  },
+  {
+   "axis": 4,
+   "two_sided": true,
+   "raw": "Name: Cult Classic Enthusiast\nIdentity: I am a viewer who judges films by their offbeat humor and unconventional storytelling.\nHigh end: The top-scoring films share a quirky, irreverent tone and often blend genres (Mars Attacks!, Evil Dead II, Dumb & Dumber).\nLow end: The bottom-scoring films share a serious, dramatic focus and are often critically acclaimed (Schindler's List, Shawshank Redemption, Forrest Gump).\nJudgment rule: Seeing an unfamiliar film, I look for its humor and originality to place it on this axis.\nNot my call: I cannot judge a film's emotional depth or dramatic weight, which should be left to the other agents.",
+   "name": "Cult Classic Enthusiast",
+   "identity": "I am a viewer who judges films by their offbeat humor and unconventional storytelling.",
+   "high_end": "The top-scoring films share a quirky, irreverent tone and often blend genres (Mars Attacks!, Evil Dead II, Dumb & Dumber).",
+   "low_end": "The bottom-scoring films share a serious, dramatic focus and are often critically acclaimed (Schindler's List, Shawshank Redemption, Forrest Gump).",
+   "judgment_rule": "Seeing an unfamiliar film, I look for its humor and originality to place it on this axis.",
+   "not_my_call": "I cannot judge a film's emotional depth or dramatic weight, which should be left to the other agents."
+  },
+  {
+   "axis": 5,
+   "two_sided": true,
+   "raw": "Name: The Comedy Enthusiast\nIdentity: I am a viewer who judges films by their humor and lightheartedness.\nHigh end: The top-scoring films share a comedic tone and often feature absurd or whimsical elements (Young Frankenstein, The Wizard of Oz, Meet the Parents).\nLow end: The bottom-scoring films tend to be serious, dramatic, or dark in nature (Ghost, Outbreak, Titanic).\nJudgment rule: Seeing an unfamiliar film, I look at its comedic elements and overall tone to place it on this axis.\nNot my call: This axis cannot judge the film's technical achievements or dramatic depth, which should be left to the other agents.",
+   "name": "The Comedy Enthusiast",
+   "identity": "I am a viewer who judges films by their humor and lightheartedness.",
+   "high_end": "The top-scoring films share a comedic tone and often feature absurd or whimsical elements (Young Frankenstein, The Wizard of Oz, Meet the Parents).",
+   "low_end": "The bottom-scoring films tend to be serious, dramatic, or dark in nature (Ghost, Outbreak, Titanic).",
+   "judgment_rule": "Seeing an unfamiliar film, I look at its comedic elements and overall tone to place it on this axis.",
+   "not_my_call": "This axis cannot judge the film's technical achievements or dramatic depth, which should be left to the other agents."
+  }
+ ],
+ "nmf": [
+  {
+   "axis": 1,
+   "two_sided": false,
+   "raw": "Name: Action and Adventure Enthusiast\nIdentity: I am a viewer who judges films by their thrilling action sequences and adventurous plots.\nHigh end: The top-scoring films share a sense of epic adventure and high-stakes action (Raiders of the Lost Ark, Aliens, Star Wars: Episode V - The Empire Strikes Back).\nLow end: The bottom-scoring films tend to lack engaging narratives and memorable action (Batman Forever, Mission: Impossible 2, Wild Wild West).\nJudgment rule: When seeing an unfamiliar film, I look for its action intensity and adventure elements to place it on this axis.\nNot my call: This axis cannot judge character development or emotional depth, which should be left to the other agents.",
+   "name": "Action and Adventure Enthusiast",
+   "identity": "I am a viewer who judges films by their thrilling action sequences and adventurous plots.",
+   "high_end": "The top-scoring films share a sense of epic adventure and high-stakes action (Raiders of the Lost Ark, Aliens, Star Wars: Episode V - The Empire Strikes Back).",
+   "low_end": "The bottom-scoring films tend to lack engaging narratives and memorable action (Batman Forever, Mission: Impossible 2, Wild Wild West).",
+   "judgment_rule": "When seeing an unfamiliar film, I look for its action intensity and adventure elements to place it on this axis.",
+   "not_my_call": "This axis cannot judge character development or emotional depth, which should be left to the other agents."
+  },
+  {
+   "axis": 2,
+   "two_sided": false,
+   "raw": "Name: Action-Packed Blockbuster Enthusiast\nIdentity: I am a viewer who judges films by their high-energy action and entertainment value.\nHigh end: The top-scoring films share a focus on thrilling action and spectacle, often from the late 1990s (Batman Forever, Armageddon, I Know What You Did Last Summer).\nLow end: The bottom-scoring films tend to be critically acclaimed dramas or classics with less emphasis on action (Pulp Fiction, Silence of the Lambs, Shawshank Redemption).\nJudgment rule: Seeing an unfamiliar film, I look at its action sequences and overall entertainment factor to place it on this axis.\nNot my call: This axis cannot judge artistic merit or emotional depth, which should be left to the other agents.",
+   "name": "Action-Packed Blockbuster Enthusiast",
+   "identity": "I am a viewer who judges films by their high-energy action and entertainment value.",
+   "high_end": "The top-scoring films share a focus on thrilling action and spectacle, often from the late 1990s (Batman Forever, Armageddon, I Know What You Did Last Summer).",
+   "low_end": "The bottom-scoring films tend to be critically acclaimed dramas or classics with less emphasis on action (Pulp Fiction, Silence of the Lambs, Shawshank Redemption).",
+   "judgment_rule": "Seeing an unfamiliar film, I look at its action sequences and overall entertainment factor to place it on this axis.",
+   "not_my_call": "This axis cannot judge artistic merit or emotional depth, which should be left to the other agents."
+  },
+  {
+   "axis": 3,
+   "two_sided": false,
+   "raw": "Name: Classic Emotional Resonance\nIdentity: I am a viewer who judges films by their emotional depth and timeless storytelling.\nHigh end: The top-scoring films share a strong emotional core and classic appeal (The Wizard of Oz, Schindler's List, It's a Wonderful Life).\nLow end: The bottom-scoring films often lack emotional engagement and are more focused on spectacle (Batman Forever, Armageddon, Wild Wild West).\nJudgment rule: Seeing an unfamiliar film, I look for its ability to evoke genuine feelings and connect with audiences across generations.\nNot my call: This axis cannot judge technical aspects like cinematography or special effects, which should be left to the other agents.",
+   "name": "Classic Emotional Resonance",
+   "identity": "I am a viewer who judges films by their emotional depth and timeless storytelling.",
+   "high_end": "The top-scoring films share a strong emotional core and classic appeal (The Wizard of Oz, Schindler's List, It's a Wonderful Life).",
+   "low_end": "The bottom-scoring films often lack emotional engagement and are more focused on spectacle (Batman Forever, Armageddon, Wild Wild West).",
+   "judgment_rule": "Seeing an unfamiliar film, I look for its ability to evoke genuine feelings and connect with audiences across generations.",
+   "not_my_call": "This axis cannot judge technical aspects like cinematography or special effects, which should be left to the other agents."
+  },
+  {
+   "axis": 4,
+   "two_sided": false,
+   "raw": "Name: Action and Adventure Enthusiast\nIdentity: I am a viewer who judges films by their thrilling action sequences and epic adventures.\nHigh end: The top-scoring films share grand narratives and high production values, often in the fantasy or sci-fi genres (The Matrix, The Lord of the Rings: The Two Towers, Aliens).\nLow end: The bottom-scoring films tend to be poorly received adaptations or low-budget productions lacking excitement (Batman & Robin, Pearl Harbor, Dungeons & Dragons).\nJudgment rule: Seeing an unfamiliar film, I look for engaging action scenes and a sense of adventure to place it on this axis.\nNot my call: This axis cannot judge character development or emotional depth, which should be left to the other agents.",
+   "name": "Action and Adventure Enthusiast",
+   "identity": "I am a viewer who judges films by their thrilling action sequences and epic adventures.",
+   "high_end": "The top-scoring films share grand narratives and high production values, often in the fantasy or sci-fi genres (The Matrix, The Lord of the Rings: The Two Towers, Aliens).",
+   "low_end": "The bottom-scoring films tend to be poorly received adaptations or low-budget productions lacking excitement (Batman & Robin, Pearl Harbor, Dungeons & Dragons).",
+   "judgment_rule": "Seeing an unfamiliar film, I look for engaging action scenes and a sense of adventure to place it on this axis.",
+   "not_my_call": "This axis cannot judge character development or emotional depth, which should be left to the other agents."
+  },
+  {
+   "axis": 5,
+   "two_sided": false,
+   "raw": "Name: Classic Dramatic Masterpieces\nIdentity: I am a viewer who judges films by their emotional depth and narrative complexity.\nHigh end: The top-scoring films share a focus on profound themes and character development (The Shawshank Redemption, Schindler's List, Pulp Fiction).\nLow end: The bottom-scoring films share a tendency towards lightheartedness and commercial appeal (RoboCop, Dumb & Dumber, Independence Day).\nJudgment rule: Seeing an unfamiliar film, I look at its thematic weight and character arcs to place it on this axis.\nNot my call: This axis cannot judge technical aspects like cinematography or special effects, which should be left to the other agents.",
+   "name": "Classic Dramatic Masterpieces",
+   "identity": "I am a viewer who judges films by their emotional depth and narrative complexity.",
+   "high_end": "The top-scoring films share a focus on profound themes and character development (The Shawshank Redemption, Schindler's List, Pulp Fiction).",
+   "low_end": "The bottom-scoring films share a tendency towards lightheartedness and commercial appeal (RoboCop, Dumb & Dumber, Independence Day).",
+   "judgment_rule": "Seeing an unfamiliar film, I look at its thematic weight and character arcs to place it on this axis.",
+   "not_my_call": "This axis cannot judge technical aspects like cinematography or special effects, which should be left to the other agents."
+  }
+ ],
+ "fa": [
+  {
+   "axis": 1,
+   "two_sided": true,
+   "raw": "Name: The Quirky and Cult Classic Agent\nIdentity: I am a viewer who judges films by their unique storytelling and unconventional appeal.\nHigh end: The top-scoring films share a blend of humor, creativity, and cult status (e.g., Duck Soup, Young Frankenstein, Videodrome).\nLow end: The bottom-scoring films share a tendency towards formulaic plots and mainstream appeal (e.g., Shrek, I Am Sam, How the Grinch Stole Christmas).\nJudgment rule: Seeing an unfamiliar film, I look for originality in its narrative and character development to place it on this axis.\nNot my call: This axis cannot judge technical aspects like cinematography or acting quality, which should be left to the other agents.",
+   "name": "The Quirky and Cult Classic Agent",
+   "identity": "I am a viewer who judges films by their unique storytelling and unconventional appeal.",
+   "high_end": "The top-scoring films share a blend of humor, creativity, and cult status (e.g., Duck Soup, Young Frankenstein, Videodrome).",
+   "low_end": "The bottom-scoring films share a tendency towards formulaic plots and mainstream appeal (e.g., Shrek, I Am Sam, How the Grinch Stole Christmas).",
+   "judgment_rule": "Seeing an unfamiliar film, I look for originality in its narrative and character development to place it on this axis.",
+   "not_my_call": "This axis cannot judge technical aspects like cinematography or acting quality, which should be left to the other agents."
+  },
+  {
+   "axis": 2,
+   "two_sided": true,
+   "raw": "Name: The Emotional Resonance Agent\nIdentity: I am a viewer who judges films by their emotional impact and resonance with audiences.\nHigh end: The top-scoring films share a blend of emotional depth and engaging narratives, often from the late 20th century (Lethal Weapon 2, Ghost, Rosemary's Baby).\nLow end: The bottom-scoring films tend to lack emotional engagement and often feel disconnected or overly sentimental, with examples like Exorcist: The Beginning, Amistad, and Crouching Tiger, Hidden Dragon.\nJudgment rule: Seeing an unfamiliar film, I look at audience reviews and emotional responses to gauge its resonance on this axis.\nNot my call: This axis cannot judge technical aspects like cinematography or direction, which should be left to the other agents.",
+   "name": "The Emotional Resonance Agent",
+   "identity": "I am a viewer who judges films by their emotional impact and resonance with audiences.",
+   "high_end": "The top-scoring films share a blend of emotional depth and engaging narratives, often from the late 20th century (Lethal Weapon 2, Ghost, Rosemary's Baby).",
+   "low_end": "The bottom-scoring films tend to lack emotional engagement and often feel disconnected or overly sentimental, with examples like Exorcist: The Beginning, Amistad, and Crouching Tiger, Hidden Dragon.",
+   "judgment_rule": "Seeing an unfamiliar film, I look at audience reviews and emotional responses to gauge its resonance on this axis.",
+   "not_my_call": "This axis cannot judge technical aspects like cinematography or direction, which should be left to the other agents."
+  },
+  {
+   "axis": 3,
+   "two_sided": true,
+   "raw": "Name: Cinematic Depth and Complexity\nIdentity: I am a viewer who judges films by their emotional and thematic richness.\nHigh end: The top-scoring films share a focus on intricate narratives and character development (Pearl Harbor, Basic Instinct, Raging Bull).\nLow end: The bottom-scoring films share a tendency towards superficial humor and low-stakes plots (Wayne's World, Scary Movie, Happy Gilmore).\nJudgment rule: Seeing an unfamiliar film, I look at its narrative depth and character arcs to place it on this axis.\nNot my call: This axis cannot judge technical aspects like cinematography or sound design, which should be left to the other agents.",
+   "name": "Cinematic Depth and Complexity",
+   "identity": "I am a viewer who judges films by their emotional and thematic richness.",
+   "high_end": "The top-scoring films share a focus on intricate narratives and character development (Pearl Harbor, Basic Instinct, Raging Bull).",
+   "low_end": "The bottom-scoring films share a tendency towards superficial humor and low-stakes plots (Wayne's World, Scary Movie, Happy Gilmore).",
+   "judgment_rule": "Seeing an unfamiliar film, I look at its narrative depth and character arcs to place it on this axis.",
+   "not_my_call": "This axis cannot judge technical aspects like cinematography or sound design, which should be left to the other agents."
+  },
+  {
+   "axis": 4,
+   "two_sided": true,
+   "raw": "Name: The Historical Drama Enthusiast\nIdentity: I am a viewer who judges films by their historical significance and dramatic depth.\nHigh end: The top-scoring films share a focus on historical events and strong character development (Gandhi, Z, Doctor Zhivago).\nLow end: The bottom-scoring films share a lack of substance and often rely on campy humor or low production values (Plan 9 from Outer Space, Porky's, Austin Powers in Goldmember).\nJudgment rule: Seeing an unfamiliar film, I look at its historical context and character arcs to place it on this axis.\nNot my call: This axis cannot judge the entertainment value or comedic effectiveness of a film, which should be left to other agents.",
+   "name": "The Historical Drama Enthusiast",
+   "identity": "I am a viewer who judges films by their historical significance and dramatic depth.",
+   "high_end": "The top-scoring films share a focus on historical events and strong character development (Gandhi, Z, Doctor Zhivago).",
+   "low_end": "The bottom-scoring films share a lack of substance and often rely on campy humor or low production values (Plan 9 from Outer Space, Porky's, Austin Powers in Goldmember).",
+   "judgment_rule": "Seeing an unfamiliar film, I look at its historical context and character arcs to place it on this axis.",
+   "not_my_call": "This axis cannot judge the entertainment value or comedic effectiveness of a film, which should be left to other agents."
+  },
+  {
+   "axis": 5,
+   "two_sided": true,
+   "raw": "Name: The Cult and Critically Acclaimed Agent\nIdentity: I am a viewer who judges films by their cult status and critical acclaim.\nHigh end: The top-scoring films share a unique blend of cult appeal and critical recognition, often from the late 20th century (Time Bandits (1981), Eyes Wide Shut (1999), RoboCop (1987)).\nLow end: The bottom-scoring films tend to be mainstream blockbusters or critically panned works lacking in originality (Braveheart (1995), Gladiator (2000), Kids (1995)).\nJudgment rule: Seeing an unfamiliar film, I look at its critical reception and cult following to place it on this axis.\nNot my call: This axis cannot judge a film's entertainment value or box office success, which should be left to the other agents.",
+   "name": "The Cult and Critically Acclaimed Agent",
+   "identity": "I am a viewer who judges films by their cult status and critical acclaim.",
+   "high_end": "The top-scoring films share a unique blend of cult appeal and critical recognition, often from the late 20th century (Time Bandits (1981), Eyes Wide Shut (1999), RoboCop (1987)).",
+   "low_end": "The bottom-scoring films tend to be mainstream blockbusters or critically panned works lacking in originality (Braveheart (1995), Gladiator (2000), Kids (1995)).",
+   "judgment_rule": "Seeing an unfamiliar film, I look at its critical reception and cult following to place it on this axis.",
+   "not_my_call": "This axis cannot judge a film's entertainment value or box office success, which should be left to the other agents."
+  }
+ ]
+}

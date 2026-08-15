@@ -17,7 +17,12 @@ VERIFY_SSL = os.environ.get("VERIFY_SSL", "false").lower() == "true"
 
 # ml-latest-small: https://files.grouplens.org/datasets/movielens/ml-latest-small.zip
 # ml-latest (전체): https://files.grouplens.org/datasets/movielens/ml-latest.zip
-DATA_DIR = "data/ml10m-500users"  # 공유 전처리 데이터(MovieLens 10M, interaction 300+ / 500 users) -- prepare_0820_data.py로 생성
+DATA_DIR = "data/ml10m-500users"  # 공유 전처리 데이터(MovieLens 10M, interaction 300+ / 500 users) -- prepare_axis_data.py로 생성
+# 유저별 후보 20개(정답 1 + negative 19)와 정답을 고정한 공용 라벨 파일.
+# 이걸 쓰지 않고 실행 시점에 negative를 뽑으면 같은 유저라도 후보가 달라져 다른 실험과 비교할 수 없다.
+# 정답도 이 파일 기준으로 잡는다 -- timestamp가 동점인 유저가 500명 중 32명 있어서
+# "가장 최근 1개"가 정렬 방식에 따라 달라지기 때문이다.
+LABELS_PATH = PROJECT_ROOT / "preprocessed" / "labels_500users.xlsx"
 MIN_HISTORY_LEN = 300  # 이 값 미만으로 평점을 남긴 유저는 제외 (긴 이력 유저만 평가)
 MAX_POOL_USERS = 1500  # heavy user 중 행렬 계산에 실제로 쓸 유저 수 상한 (dense 행렬 크기 제어)
 
@@ -38,3 +43,4 @@ N_NEGATIVES = 19
 TOP_K = 5
 N_EVAL_USERS = 500  # Inference User N -- 공유 데이터의 500명 전원 평가
 RANDOM_SEED = 42
+PERSONAS_PATH = "axis_personas.json"  # build_personas.py 가 만든 고정 페르소나 (없으면 실행 시 생성)

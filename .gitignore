@@ -9,6 +9,6 @@ raw_data/ml-10M100K/*
 !raw_data/ml-10M100K/README.md
 
 # 실행 결과물 (results*.csv 와 그 옆의 축/페르소나 캐시)
-0820_CODE/results*.csv
-0820_CODE/*.axes.json
-0820_CODE/axis_prompts_dump.txt
+axis_rerank/results*.csv
+axis_rerank/*.axes.json
+axis_rerank/axis_prompts_dump.txt

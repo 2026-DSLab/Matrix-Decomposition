@@ -17,6 +17,9 @@ VERIFY_SSL = os.environ.get("VERIFY_SSL", "false").lower() == "true"
 
 RATINGS_PATH = PROJECT_ROOT / "preprocessed" / "ratings_min300_500users.xlsx"
 MOVIES_PATH = PROJECT_ROOT / "raw_data" / "ml-10M100K" / "movies.dat"
+# 유저별 후보 20개(정답 1 + negative 19)와 정답을 고정한 공용 라벨 파일.
+# build_label_file.py가 만든 이 파일을 그대로 읽어야 다른 실험과 후보가 일치한다.
+LABELS_PATH = PROJECT_ROOT / "preprocessed" / "labels_500users.xlsx"
 
 N_NEGATIVES = 19  # candidates = 1 test label + N_NEGATIVES
 TOP_K = 5
