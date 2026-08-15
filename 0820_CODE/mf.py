@@ -12,8 +12,11 @@ def _user_means(rating_matrix):
     return mask, means
 
 
-def fit_svd(rating_matrix: np.ndarray, k: int, extra_features: np.ndarray | None = None):
+def fit_svd(rating_matrix: np.ndarray, k: int, extra_features: np.ndarray | None = None, seed: int = 42):
     """평균 중심화 SVD. 축은 부호 있는 선형 성분이라 회전 불변성 문제가 있음.
+    svds는 ARPACK 반복법이라 시작 벡터를 난수로 잡는다 -- random_state를 안 주면 같은 입력에도
+    실행마다 축 부호가 뒤집혀서(5회 중 1회꼴로 관측) 같은 축이 반대 의미로 해석된다. nmf/fa는
+    random_state가 이미 고정돼 있어 svd만 해당됐다.
     extra_features(유저 x n_extra, 이미 중심화된 값)가 주어지면 압축 직전에 이어붙여서
     함께 압축하되, 압축 결과(H)는 원본 아이템 개수만큼만 남긴다 -- 새 feature가 압축(U)에는
     반영되지만 축의 "표현"은 항상 실제 아이템 공간에 남도록 하기 위함. rank-k SVD 근사를
@@ -24,7 +27,7 @@ def fit_svd(rating_matrix: np.ndarray, k: int, extra_features: np.ndarray | None
     n_items = rating_matrix.shape[1]
     F = np.hstack([centered, extra_features]) if extra_features is not None else centered
 
-    U, S, Vt = svds(F, k=k)
+    U, S, Vt = svds(F, k=k, random_state=seed)
     order = np.argsort(-S)
     U, S, Vt = U[:, order], S[order], Vt[order, :]
     Vt = Vt[:, :n_items]
@@ -41,20 +44,24 @@ def fit_nmf(
     max_iter: int = 300,
     seed: int = 42,
 ):
-    """비음수 행렬분해. 미관측(0)을 그대로 0 평점으로 취급하는 표준 NMF이므로
-    희소성이 심한 데이터에서는 편향될 수 있음 -- 결과 해석 시 유의.
+    """비음수 행렬분해. 미관측 칸은 0(=0점, 최악의 평가)이 아니라 그 유저의 평균 평점으로
+    채운 뒤 분해한다 -- NMF는 비음수 제약 때문에 svd/fa처럼 중심화를 할 수 없어서, 0을
+    그대로 두면 전체 칸의 93%가 '0점'이 되어 예측이 통째로 낮게 깔린다(이 데이터에서
+    잔차 평균 +1.98, rmse 2.36으로 유저 평균만 쓴 기준선 0.98보다도 나빴음). 미관측을
+    유저 평균으로 채우면 svd/fa의 '중심화 후 0 = 유저 평균' 처리와 의미가 같아지고,
+    rmse 0.90 / 잔차 평균 -0.04로 정상화된다.
     extra_features는 fit_svd와 같은 방식으로 이어붙였다가 압축 후 슬라이스해서 뺀다.
     NMF는 비음수만 허용하므로 extra_features의 음수값은 0으로 클리핑한다(사칙연산 중
     -, /의 결과가 음수일 수 있음 -- 이 방법에서는 그 정보가 일부 손실되는 한계로 남는다)."""
     n_items = rating_matrix.shape[1]
-    F = rating_matrix
+    mask, user_means = _user_means(rating_matrix)
+    F = np.where(mask, rating_matrix, np.repeat(user_means[:, None], n_items, axis=1))
     if extra_features is not None:
         F = np.hstack([F, np.clip(extra_features, 0, None)])
     model = NMF(n_components=k, init="nndsvda", max_iter=max_iter, random_state=seed)
     U = model.fit_transform(F)
     H = model.components_[:, :n_items]
     recon = U @ H
-    mask = rating_matrix != 0
     residual = np.where(mask, rating_matrix - recon, 0)
     return U, H, residual
 
@@ -82,6 +89,7 @@ def fit_genre(
     k: int,
     item_genre_matrix: np.ndarray,
     extra_features: np.ndarray | None = None,
+    seed: int = 42,
 ):
     """장르별 평균평점을 '입력 feature'(유저 x 장르)로 구성한 뒤, 그 위에서 SVD로
     k개 축으로 압축한다 -- 축(axis) != feature. 장르 자체가 아니라, 장르들의 선형결합인
@@ -104,7 +112,7 @@ def fit_genre(
     F = np.hstack([G_centered, extra_features]) if extra_features is not None else G_centered
 
     k = min(k, n_genres - 1)
-    U, S, Vt = svds(F, k=k)
+    U, S, Vt = svds(F, k=k, random_state=seed)  # fit_svd와 같은 이유로 시드 고정
     order = np.argsort(-S)
     U, S, Vt = U[:, order], S[order], Vt[order, :]
     H_genre = Vt[:, :n_genres]  # (k, n_genres): 압축된 축이 어떤 장르 조합인지

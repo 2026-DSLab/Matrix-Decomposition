@@ -1,6 +1,10 @@
 import requests
+import urllib3
 
-from config import MODEL, OPENROUTER_API_KEY, OPENROUTER_BASE_URL
+from config import MODEL, OPENROUTER_API_KEY, OPENROUTER_BASE_URL, VERIFY_SSL
+
+if not VERIFY_SSL:
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 def chat(messages, temperature: float = 0.0, max_tokens: int = 200) -> str:
@@ -19,6 +23,7 @@ def chat(messages, temperature: float = 0.0, max_tokens: int = 200) -> str:
             "max_tokens": max_tokens,
         },
         timeout=60,
+        verify=VERIFY_SSL,
     )
     resp.raise_for_status()
     return resp.json()["choices"][0]["message"]["content"]

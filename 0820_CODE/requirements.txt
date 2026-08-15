@@ -4,3 +4,4 @@ scipy
 requests
 tqdm
 scikit-learn
+python-dotenv

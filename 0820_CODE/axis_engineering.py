@@ -115,13 +115,19 @@ def engineer_axes_llm(
     item_genre_matrix=None,
     genre_names=None,
     max_rounds=10,
+    replay=None,
 ):
     """축끼리 직접 조합하는 대신, LLM이 제안한 조합으로 새 feature를 만들어 원본 feature
     행렬(genre는 유저x장르, 나머지는 유저x영화)에 컬럼으로 추가하고, 매 라운드 그 방법
     (svd/nmf/fa/genre)으로 처음부터 다시 압축한다 -- "축은 항상 feature를 압축한 결과"라는
     원칙이 새로 추가되는 정보에도 그대로 유지되도록 하기 위함. 몇 개를 추가할지도 LLM이
     CONTINUE/STOP으로 직접 결정한다. 서버는 제안을 검증만 하고(무효면 조용히 중단,
-    fail-safe), 반영 계산(feature 컬럼 생성 + 재압축)은 수치적으로 수행한다."""
+    fail-safe), 반영 계산(feature 컬럼 생성 + 재압축)은 수치적으로 수행한다.
+
+    replay에 이전 실행에서 채택된 조합 목록을 주면 LLM에 다시 묻지 않고 그대로 재현한다 --
+    중간에 끊긴 실행을 이어갈 때 축이 달라지면 이미 저장된 유저들과 다른 축으로 프로필을
+    만들게 되고, 캐시해둔 축 페르소나도 실제 축과 어긋나기 때문이다. 채택된 조합만 알면
+    행렬 연산은 결정적이므로 H/잔차가 정확히 복원된다."""
     fit_kwargs = {"item_genre_matrix": item_genre_matrix} if method == "genre" else {}
     result = fit_factorization(rating_matrix, k, method=method, **fit_kwargs)
     if method == "genre":
@@ -137,7 +143,10 @@ def engineer_axes_llm(
     engineered_desc = []
     used = set()
 
-    for _ in range(max_rounds):
+    accepted = []  # 채택된 조합 -- 다음 실행에서 replay로 그대로 재현하기 위해 반환한다
+    rounds = len(replay) if replay is not None else max_rounds
+
+    for round_i in range(rounds):
         prev_err = float((residual**2).sum())
         if prev_err < 1e-12:
             break
@@ -145,27 +154,37 @@ def engineer_axes_llm(
         far_items = _global_far_items(residual, item_idx_inv, title_map, n=10)
 
         if method == "genre":
-            proposal = _propose_genre_combo(genre_names, far_items, method)
-            if proposal is None:
-                break
-            label_a, op_name, label_b = proposal
-            key = (label_a, op_name, label_b)
+            if replay is not None:
+                key = tuple(replay[round_i])
+            else:
+                proposal = _propose_genre_combo(genre_names, far_items, method)
+                if proposal is None:
+                    break
+                key = proposal
             if key in used:
                 break
+            label_a, op_name, label_b = key
             ia, ib = genre_names.index(label_a), genre_names.index(label_b)
             new_col = _ENGINEER_OPS[op_name](G_centered[:, ia], G_centered[:, ib])
             desc_text = f"{label_a} {op_name} {label_b}"
         else:
-            proposal = _propose_item_combo(H, axis_labels, item_idx_inv, title_map, far_items, method)
-            if proposal is None:
-                break
-            item_a, op_name, item_b = proposal
+            if replay is not None:
+                col_a, op_name, col_b = replay[round_i]
+                col_a, col_b = int(col_a), int(col_b)
+                item_a = (col_a, title_map.get(item_idx_inv[col_a], str(col_a)))
+                item_b = (col_b, title_map.get(item_idx_inv[col_b], str(col_b)))
+            else:
+                proposal = _propose_item_combo(H, axis_labels, item_idx_inv, title_map, far_items, method)
+                if proposal is None:
+                    break
+                item_a, op_name, item_b = proposal
             key = (item_a[0], op_name, item_b[0])
             if key in used:
                 break
             combo = _ENGINEER_OPS[op_name](rating_matrix[:, item_a[0]], rating_matrix[:, item_b[0]])
             new_col = combo - user_means
             desc_text = f"{item_a[1]} {op_name} {item_b[1]}"
+        accepted.append(list(key))
 
         used.add(key)
         engineered_cols.append(new_col)
@@ -179,9 +198,10 @@ def engineer_axes_llm(
         new_err = float((new_residual**2).sum())
         gain_pct = 100 * (prev_err - new_err) / prev_err if prev_err > 0 else 0.0
         residual = new_residual
-        engineered_desc.append(f"{desc_text} (residual -{gain_pct:.1f}%)")
+        # gain_pct가 음수면 "residual +x%"로 찍혀 잔차가 늘었음을 그대로 보여준다
+        engineered_desc.append(f"{desc_text} (residual {-gain_pct:+.1f}%)")
 
-        if not _ask_continue(engineered_desc, gain_pct):
+        if replay is None and not _ask_continue(engineered_desc, gain_pct):
             break
 
-    return U, H, residual, engineered_desc, axis_labels
+    return U, H, residual, engineered_desc, axis_labels, accepted

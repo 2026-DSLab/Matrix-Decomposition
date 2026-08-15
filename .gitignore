@@ -2,3 +2,13 @@ __pycache__/
 *.pyc
 .env
 naive_rerank/results*.csv
+
+# 원본 데이터셋 -- ratings.dat 하나만 265MB라 커밋하지 않음.
+# https://files.grouplens.org/datasets/movielens/ml-10m.zip 에서 받아 여기에 풀 것.
+raw_data/ml-10M100K/*
+!raw_data/ml-10M100K/README.md
+
+# 실행 결과물 (results*.csv 와 그 옆의 축/페르소나 캐시)
+0820_CODE/results*.csv
+0820_CODE/*.axes.json
+0820_CODE/axis_prompts_dump.txt
