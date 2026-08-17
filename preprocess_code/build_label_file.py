@@ -27,8 +27,14 @@ def leave_one_out_split(ratings: pd.DataFrame):
     return train.reset_index(drop=True), test_rows.reset_index(drop=True)
 
 
+def load_ratings(ratings_path: str) -> pd.DataFrame:
+    if ratings_path.endswith(".csv"):
+        return pd.read_csv(ratings_path)
+    return pd.read_excel(ratings_path)
+
+
 def build_label_file(ratings_path: str, raw_dir: str, n_negatives: int, seed: int) -> pd.DataFrame:
-    ratings = pd.read_excel(ratings_path)
+    ratings = load_ratings(ratings_path)
     movies = load_movies(raw_dir)
     title_map = dict(zip(movies.movieId, movies.title))
     genre_map = dict(zip(movies.movieId, movies.genres))

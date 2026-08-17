@@ -1,6 +1,8 @@
+import json
+
 import pandas as pd
 
-from config import MOVIES_PATH, RATINGS_PATH
+from config import LABELS_PATH, MOVIES_PATH, RATINGS_PATH
 
 
 def load_ratings() -> pd.DataFrame:
@@ -12,6 +14,14 @@ def load_movies() -> pd.DataFrame:
         MOVIES_PATH, sep="::", engine="python",
         names=["movieId", "title", "genres"], encoding="latin-1",
     )
+
+
+def load_labels() -> pd.DataFrame:
+    """preprocess_code/build_label_file.py가 만든 고정 후보(20개) 라벨 파일 로드."""
+    df = pd.read_excel(LABELS_PATH)
+    df["candidate_movieIds"] = df["candidate_movieIds"].apply(json.loads)
+    df["candidate_titles"] = df["candidate_titles"].apply(json.loads)
+    return df
 
 
 def leave_one_out_split(ratings: pd.DataFrame, seed: int = 42):

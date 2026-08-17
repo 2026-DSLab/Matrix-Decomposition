@@ -20,5 +20,6 @@ def chat(messages, temperature: float = 0.0, max_tokens: int = 200) -> str:
         },
         timeout=60,
     )
-    resp.raise_for_status()
+    if not resp.ok:
+        raise RuntimeError(f"OpenRouter {resp.status_code} error: {resp.text}")
     return resp.json()["choices"][0]["message"]["content"]
